@@ -1,0 +1,93 @@
+## Task Manager Codebase: Summary Document
+
+### 1. Initial vs Final Understanding
+
+#### Initial understanding
+- Task manager CLI in Python, minimal storage.
+- Surmised files: CLI, models, storage, parser, priority, task manager.
+- Believed there might be export feature by default.
+- Unsure how commands map to implementation.
+
+#### Final understanding (after inspection/execution)
+- Confirmed structure:
+  - cli.py = user command entrypoint (`create`, `list`, `status`, `priority`, `due`, `tag`, `untag`, `show`, `delete`, `stats`)
+  - task_manager.py = business logic + task filtering/updating
+  - storage.py = JSON persistence with `TaskEncoder` / `TaskDecoder`
+  - `models.py` = `Task`, `TaskStatus`, `TaskPriority` definitions
+  - task_parser.py, task_list_merge.py = utility functions (parsing text, merging lists)
+- Project uses Python stdlib only (argparse/json/csv etc).
+- Export to CSV did not exist; we need implement it.
+- Test workflow: `python -m unittest discover tests`.
+
+---
+
+### 2. Most Valuable Insights from Each Prompt
+
+#### Prompt: “validate structure + run instructions”
+- Confirmed app is fully local CLI with JSON store.
+- Learned actual command names and patterns.
+
+#### Prompt: “Python missing / install”
+- Solved environment issue (3.14 installed).
+- Showed importance of verifying runtime first.
+
+#### Prompt: “search for export / file I/O”
+- Found that all I/O lives in storage.py and no export code exists.
+- Identified role of `TaskEncoder` for transformation.
+
+#### Prompt: “hypothesis for export feature location”
+- Decided place is `TaskManager` + cli.py + tests.
+- Derived required data transformation using existing Task -> JSON path.
+
+#### Prompt: “develop code exploration strategy”
+- Finalized full-level workflow for implementation.
+
+---
+
+### 3. Approach to Implementing New Business Rule (“Export to CSV”)
+
+1. **Clarify behavior**
+   - Export all tasks (optionally filtered by status/priority/overdue) to CSV.
+   - Header + rows, file path parameter.
+2. **Map to layers**
+   - `TaskManager.export_tasks_to_csv(filename, status=None, priority=None, overdue=False)`
+   - cli.py subcommand `export` + argument parser.
+   - (Optionally) add helper to storage.py for CSV writing.
+3. **Reuse existing logic**
+   - `TaskManager.list_tasks(...)` for filtered retrieval.
+   - `TaskEncoder` conversion patterns (enums + datetime to string).
+   - `storage.save()` style error handling.
+4. **Add tests**
+   - New test in `tests/` for export output and record count.
+5. **Document**
+   - README section with command example.
+
+---
+
+### 4. Strategies for Future Unfamiliar Code
+
+- **Start with existing docs + tree**:
+  - `README`, folder names, `__init__` patterns.
+- **Identify entry points**:
+  - CLI, web routes, scheduler main.
+- **Do quick “smoke run”**:
+  - Execute known command path + tests.
+- **Search for missing feature keywords and analogies**:
+  - `export`/`csv`, and if absent infer ideal place.
+- **Trace through logic from inputs to persistence**
+  - Call chain e.g., CLI → manager → storage → file.
+- **Use the project’s own phrase patterns**:
+  - enums names, model fields.
+- **Iterate with small edits/test cycles**.
+- **Ask clarifying questions early**: "Do we prefer action in TaskManager vs Storage layer?"
+
+---
+
+## Extra Note
+
+This code is an ideal learning project:
+- Simple domain model
+- Clear separation of concerns
+- Low dependency noise
+
+The remaining step is implement export and hook CLI in a 10-minute patch; design is validated by my exploration.
