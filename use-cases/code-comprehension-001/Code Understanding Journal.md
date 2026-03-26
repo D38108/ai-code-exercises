@@ -248,7 +248,7 @@ After completion:
 
 That is your end-to-end completion state transition.
 
-##  3-5 Minute Presentation: TaskManager CLI App (Team Share)
+# Part 4
 
 ### 1. High-level architecture (30s)
 - **Entry**: cli.py (argparse commands)
@@ -333,3 +333,14 @@ That is your end-to-end completion state transition.
 - The best way to understand is not one big read, but “execute → trace → verify → repeat”.
 - Ask directed prompts and validate each layer with a quick offline command; that’s the process I used.
 - Next step for team: propose adding “export” endpoint using same pattern (TaskManager + CLI + test + small storage extension).
+
+Algorithm Deconstruction Challange:
+
+1.The AI clarified that the sorting is actually a multi factor ranking based on multiple factors combining into a single score to weigh each task.
+
+2. The actual weighting criteria and calculations were a little difficult to grasp.
+
+3. "Imagine a scoring game for tasks. HIGH priority tasks start with 40 points. If it's overdue, add 35 more. If it has 'critical' tag, add 8. Add up all the bonuses. The task with the highest score is most important. That's what we sort by."
+
+4. Normalize scores: Weights don't scale well if you add many factors. Use 0-100 scale 
+Tie-breaker: Two tasks with same score—add secondary sort (e.g., created_at).
