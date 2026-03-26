@@ -44,6 +44,17 @@ def calculate_task_score(task):
 
     return score
 
+def calculate_task_score_with_user(task, current_user=None):
+    """
+    calculate_task_score extended with a +12 boost for tasks assigned to
+    the current_user.  Added via TDD (Exercise 3.1).
+    """
+    score = calculate_task_score(task)
+    if current_user and getattr(task, "assigned_to", None) == current_user:
+        score += 12
+    return score
+
+
 def sort_tasks_by_importance(tasks):
     """Sort tasks by calculated importance score (highest first)."""
     task_scores = [(calculate_task_score(task), task) for task in tasks]
